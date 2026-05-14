@@ -9,33 +9,32 @@ const TEMPLATES = [
   { id: 'calendar',  icon: '📅', label: 'Planning' },
 ];
 
+// Endpoint Base44 backend — clé Gemini sécurisée côté serveur
+const API_URL = 'https://api.base44.app/api/apps/6a05cc815554bfe5eed22c82/functions/generateCode';
+
 let selectedTemplate = 'todo';
 let currentCode = '';
 let currentBlobUrl = null;
 
 document.addEventListener('DOMContentLoaded', function () {
   renderTemplates();
-
   document.getElementById('generateBtn').addEventListener('click', generateApp);
   document.getElementById('modifyBtn').addEventListener('click', modifyApp);
   document.getElementById('downloadBtn').addEventListener('click', downloadApp);
   document.getElementById('newProjectBtn').addEventListener('click', newProject);
   document.getElementById('openTabBtn').addEventListener('click', openPreviewTab);
-
   document.getElementById('mainPrompt').addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && e.ctrlKey) generateApp();
   });
-
   document.getElementById('tab-preview').addEventListener('click', function () { switchTab('preview'); });
   document.getElementById('tab-code').addEventListener('click', function () { switchTab('code'); });
-
   document.getElementById('dev-full').addEventListener('click', function () { setDevice('full'); });
   document.getElementById('dev-tablet').addEventListener('click', function () { setDevice('tablet'); });
   document.getElementById('dev-mobile').addEventListener('click', function () { setDevice('mobile'); });
 });
 
 function renderTemplates() {
-  const grid = document.getElementById('templateGrid');
+  var grid = document.getElementById('templateGrid');
   grid.innerHTML = TEMPLATES.map(function (t) {
     return '<button class="template-card border border-gray-700 rounded-xl p-3 text-left hover:border-indigo-500 transition-all cursor-pointer" data-id="' + t.id + '">' +
       '<div class="text-2xl mb-1">' + t.icon + '</div>' +
@@ -54,24 +53,30 @@ function selectTemplate(id) {
   if (card) card.classList.add('selected');
 }
 
+async function callBackend(payload) {
+  // Le SDK Base44 attend { prompt: "..." } — on sérialise notre payload dedans
+  var res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: JSON.stringify(payload) })
+  });
+  var data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
 async function generateApp() {
   var desc = document.getElementById('mainPrompt').value.trim();
   setLoading(true);
   try {
-    var res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ template: selectedTemplate, description: desc })
-    });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erreur serveur');
+    var data = await callBackend({ template: selectedTemplate, description: desc });
     currentCode = data.code;
     document.getElementById('modelBadge').textContent = data.model || 'Gemini 2.5';
     renderPreview(currentCode);
     document.getElementById('modifySection').classList.remove('hidden');
     document.getElementById('downloadSection').classList.remove('hidden');
     document.getElementById('openTabBtn').classList.remove('hidden');
-    showStatus('✅ App générée !', 'green');
+    showStatus('✅ App générée avec ' + (data.model || 'Gemini') + ' !', 'green');
   } catch (e) {
     showStatus('❌ ' + e.message, 'red');
   } finally {
@@ -84,13 +89,7 @@ async function modifyApp() {
   if (!mod || !currentCode) return;
   setLoading(true);
   try {
-    var res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentCode: currentCode, modifyPrompt: mod })
-    });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erreur serveur');
+    var data = await callBackend({ currentCode: currentCode, modifyPrompt: mod });
     currentCode = data.code;
     renderPreview(currentCode);
     document.getElementById('modifyPrompt').value = '';
@@ -142,7 +141,7 @@ function showStatus(msg, color) {
   el.className = 'mt-2 text-xs text-center py-1.5 px-3 rounded-lg ' +
     (color === 'green' ? 'bg-emerald-900/50 text-emerald-400' : 'bg-red-900/50 text-red-400');
   el.classList.remove('hidden');
-  setTimeout(function () { el.classList.add('hidden'); }, 5000);
+  setTimeout(function () { el.classList.add('hidden'); }, 6000);
 }
 
 function switchTab(tab) {
