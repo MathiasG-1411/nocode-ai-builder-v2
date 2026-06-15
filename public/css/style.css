@@ -1,6 +1,145 @@
-.gradient-bg { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
-.loader { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body { font-family: 'Inter', system-ui, sans-serif; }
+
+/* ── Brand gradient ── */
+.gradient-bg { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%); }
+
+/* ── Animated gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Loader ── */
+.loader {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Loading dots ── */
+.loading-dots span {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #a78bfa;
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%            { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Tabs ── */
 .tab-active { background: white !important; color: #6366f1 !important; font-weight: 600; }
-.template-card.selected { border-color: #6366f1 !important; background: rgba(99,102,241,0.15) !important; }
-pre { font-family: 'Courier New', monospace; }
+
+/* ── Template cards ── */
+.template-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.template-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.template-card:hover::before { opacity: 0.08; }
+.template-card.selected {
+  border-color: #6366f1 !important;
+  background: rgba(99,102,241,0.12) !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.template-card.selected::before { opacity: 0.1; }
+
+/* ── Example prompt chips ── */
+.prompt-chip {
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid rgba(99,102,241,0.3);
+}
+.prompt-chip:hover {
+  background: rgba(99,102,241,0.2);
+  border-color: #6366f1;
+  transform: translateY(-1px);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Fade-in animation ── */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Slide-in sections ── */
+.slide-in {
+  animation: slideIn 0.3s ease forwards;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Status badge animation ── */
+.status-appear {
+  animation: statusPop 0.25s ease forwards;
+}
+@keyframes statusPop {
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Code view ── */
+pre { font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace; }
+
+/* ── Generate button pulse ── */
+.generate-pulse:not(:disabled):hover {
+  box-shadow: 0 0 20px rgba(139,92,246,0.4), 0 0 40px rgba(99,102,241,0.2);
+  transform: translateY(-1px);
+}
+.generate-pulse { transition: all 0.2s ease; }
+
+/* ── Device frame ── */
+#deviceBox {
+  transition: max-width 0.3s ease, max-height 0.3s ease;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ── Step indicator ── */
+.step-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+}
+.step-dot.active {
+  background: #a78bfa;
+  box-shadow: 0 0 8px rgba(167,139,250,0.8);
+}
+.step-dot.done { background: #34d399; }

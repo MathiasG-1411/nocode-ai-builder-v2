@@ -4,70 +4,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NoCode AI Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="bg-gray-950 text-white min-h-screen flex flex-col">
 
 <!-- Header -->
-<header class="gradient-bg px-6 py-4 flex items-center justify-between shadow-xl">
-  <div class="flex items-center gap-3">
-    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-xl">🚀</div>
-    <div>
-      <span class="font-bold text-lg">NoCode AI Builder</span>
-      <span id="modelBadge" class="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">Gemini 2.5</span>
+<header class="gradient-bg px-6 py-3.5 flex items-center justify-between shadow-2xl relative">
+  <div class="absolute inset-0 bg-black/10 backdrop-blur-sm pointer-events-none"></div>
+  <div class="relative flex items-center gap-3">
+    <div class="w-9 h-9 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-xl shadow-inner">🚀</div>
+    <div class="flex items-center gap-2.5">
+      <span class="font-bold text-lg tracking-tight">NoCode AI Builder</span>
+      <span id="modelBadge" class="text-xs bg-white/20 backdrop-blur px-2.5 py-1 rounded-full font-medium border border-white/10">Gemini 2.5</span>
     </div>
   </div>
-  <div class="flex gap-2">
-    <button id="newProjectBtn" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition-all">+ Nouveau</button>
-    <button id="openTabBtn" class="hidden bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition-all">↗ Ouvrir</button>
+  <div class="relative flex gap-2">
+    <button id="newProjectBtn" class="bg-white/15 hover:bg-white/25 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition-all border border-white/10 hover:border-white/20">
+      + Nouveau
+    </button>
+    <button id="openTabBtn" class="hidden bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-50 transition-all shadow-sm">
+      ↗ Ouvrir
+    </button>
   </div>
 </header>
 
 <!-- Main -->
-<div class="flex flex-1 overflow-hidden" style="height:calc(100vh - 65px)">
+<div class="flex flex-1 overflow-hidden" style="height:calc(100vh - 61px)">
 
   <!-- Left Panel -->
-  <div class="w-96 bg-gray-900 flex flex-col border-r border-gray-800 overflow-y-auto">
+  <div class="w-96 bg-gray-900 flex flex-col border-r border-gray-800/80 overflow-y-auto">
 
     <!-- Templates -->
-    <div class="p-4 border-b border-gray-800">
-      <p class="text-xs text-indigo-400 font-semibold mb-3">① TYPE D'APP</p>
+    <div class="p-4 border-b border-gray-800/80">
+      <p class="text-xs text-indigo-400 font-semibold mb-3 tracking-wider">① TYPE D'APP</p>
       <div class="grid grid-cols-2 gap-2" id="templateGrid"></div>
     </div>
 
     <!-- Description -->
-    <div class="p-4 border-b border-gray-800">
-      <p class="text-xs text-indigo-400 font-semibold mb-2">② DÉCRIS TON APP</p>
-      <textarea id="mainPrompt" rows="5"
-        placeholder="Ex: Une app de gestion de tâches pour une équipe marketing, avec des catégories par projet, des priorités et des dates limite..."
-        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-sm text-white placeholder-gray-500 resize-none focus:border-indigo-500 focus:outline-none"></textarea>
-      <p class="text-xs text-gray-600 mt-1">Ctrl+Entrée pour générer</p>
+    <div class="p-4 border-b border-gray-800/80">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs text-indigo-400 font-semibold tracking-wider">② DÉCRIS TON APP</p>
+        <span id="charCount" class="text-xs text-gray-600">0 / 500</span>
+      </div>
+      <textarea id="mainPrompt" rows="5" maxlength="500"
+        placeholder="Ex: Une app de gestion de tâches pour une équipe marketing, avec des catégories, priorités et dates limite..."
+        class="w-full bg-gray-800/80 border border-gray-700/80 rounded-xl px-3 py-3 text-sm text-white placeholder-gray-500 resize-none focus:border-indigo-500 focus:outline-none transition-colors"></textarea>
+      <div class="flex items-center justify-between mt-2">
+        <p class="text-xs text-gray-600">Ctrl+Entrée pour générer</p>
+      </div>
+      <!-- Example prompts -->
+      <div id="exampleChips" class="mt-3">
+        <p class="text-xs text-gray-500 mb-2">Essaie ces exemples :</p>
+        <div class="flex flex-wrap gap-1.5" id="chipList"></div>
+      </div>
     </div>
 
     <!-- Generate -->
-    <div class="p-4 border-b border-gray-800">
-      <button id="generateBtn" class="w-full gradient-bg hover:opacity-90 py-3.5 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 shadow-lg text-base">
-        <span id="generateBtnText">✨ Générer l'app</span>
+    <div class="p-4 border-b border-gray-800/80">
+      <button id="generateBtn" class="generate-pulse w-full gradient-bg hover:opacity-90 py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 shadow-lg text-base">
+        <span id="generateBtnIcon">✨</span>
+        <span id="generateBtnText">Générer l'app</span>
       </button>
       <div id="statusMsg" class="hidden mt-2 text-xs text-center py-1.5 px-3 rounded-lg"></div>
     </div>
 
     <!-- Modify -->
-    <div id="modifySection" class="hidden p-4 border-b border-gray-800">
-      <p class="text-xs text-indigo-400 font-semibold mb-2">③ MODIFIER</p>
+    <div id="modifySection" class="hidden p-4 border-b border-gray-800/80 slide-in">
+      <p class="text-xs text-indigo-400 font-semibold mb-2 tracking-wider">③ MODIFIER</p>
       <textarea id="modifyPrompt" rows="3"
         placeholder="Ex: Ajoute une barre de recherche, change les couleurs en bleu..."
-        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 resize-none focus:border-indigo-500 focus:outline-none"></textarea>
-      <button id="modifyBtn" class="mt-2 w-full bg-indigo-600 hover:bg-indigo-700 py-2.5 rounded-xl text-sm font-semibold transition-all">
+        class="w-full bg-gray-800/80 border border-gray-700/80 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-500 resize-none focus:border-indigo-500 focus:outline-none transition-colors"></textarea>
+      <button id="modifyBtn" class="mt-2 w-full bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-xl text-sm font-semibold transition-all">
         Appliquer la modification
       </button>
     </div>
 
     <!-- Download -->
-    <div id="downloadSection" class="hidden p-4">
-      <button id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 py-2.5 rounded-xl text-sm font-bold transition-all">
-        ⬇️ Télécharger le HTML
+    <div id="downloadSection" class="hidden p-4 slide-in">
+      <button id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+        <span>⬇️</span> Télécharger le HTML
       </button>
     </div>
   </div>
@@ -76,38 +94,88 @@
   <div class="flex-1 flex flex-col overflow-hidden">
 
     <!-- Tabs + device -->
-    <div class="bg-gray-900 border-b border-gray-800 flex items-center px-4 py-2 gap-1">
+    <div class="bg-gray-900 border-b border-gray-800/80 flex items-center px-4 py-2 gap-1">
       <button id="tab-preview" class="tab-active px-4 py-1.5 rounded-lg text-sm transition-all">👁️ Aperçu</button>
-      <button id="tab-code" class="px-4 py-1.5 rounded-lg text-sm transition-all bg-gray-800 text-gray-400">💻 Code</button>
-      <div class="ml-auto flex gap-1">
-        <button id="dev-full"   class="text-xs px-3 py-1 rounded-lg bg-gray-700 text-white">🖥️</button>
-        <button id="dev-tablet" class="text-xs px-3 py-1 rounded-lg bg-gray-800 text-gray-500">📱 768</button>
-        <button id="dev-mobile" class="text-xs px-3 py-1 rounded-lg bg-gray-800 text-gray-500">📲 375</button>
+      <button id="tab-code" class="px-4 py-1.5 rounded-lg text-sm transition-all bg-gray-800 text-gray-400 hover:text-gray-200">💻 Code</button>
+      <div class="ml-auto flex gap-1.5 items-center">
+        <span class="text-xs text-gray-600 mr-1">Appareil :</span>
+        <button id="dev-full"   class="text-xs px-3 py-1.5 rounded-lg bg-gray-700 text-white font-medium transition-all">🖥️</button>
+        <button id="dev-tablet" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300 transition-all">📱 768</button>
+        <button id="dev-mobile" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300 transition-all">📲 375</button>
       </div>
     </div>
 
     <!-- Preview -->
-    <div id="panel-preview" class="flex-1 flex items-center justify-center bg-gray-800 overflow-hidden">
-      <div id="emptyState" class="text-center p-10 max-w-md">
-        <div class="text-7xl mb-5">🎨</div>
-        <h2 class="text-2xl font-bold mb-3">Génère ton app</h2>
-        <p class="text-gray-400 text-sm">Choisis un type, décris ce que tu veux, et Gemini génère une app <strong>100% fonctionnelle</strong> en quelques secondes.</p>
+    <div id="panel-preview" class="flex-1 flex items-center justify-center bg-gray-800/50 overflow-hidden">
+
+      <!-- Empty state -->
+      <div id="emptyState" class="text-center p-10 max-w-lg fade-in">
+        <div class="text-6xl mb-5 select-none">🎨</div>
+        <h2 class="text-2xl font-bold mb-2">
+          Génère ton app
+          <span class="gradient-text"> en secondes</span>
+        </h2>
+        <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+          Choisis un type d'app, décris ce que tu veux, et Gemini crée une application
+          <strong class="text-white">100% fonctionnelle</strong> — sans écrire une ligne de code.
+        </p>
+        <div class="grid grid-cols-3 gap-3 text-left">
+          <div class="bg-gray-800/60 border border-gray-700/60 rounded-xl p-3">
+            <div class="text-xl mb-1.5">📝</div>
+            <p class="text-xs font-semibold text-gray-200 mb-0.5">Décris</p>
+            <p class="text-xs text-gray-500">En langage naturel</p>
+          </div>
+          <div class="bg-gray-800/60 border border-gray-700/60 rounded-xl p-3">
+            <div class="text-xl mb-1.5">⚡</div>
+            <p class="text-xs font-semibold text-gray-200 mb-0.5">Génère</p>
+            <p class="text-xs text-gray-500">En 15–30 secondes</p>
+          </div>
+          <div class="bg-gray-800/60 border border-gray-700/60 rounded-xl p-3">
+            <div class="text-xl mb-1.5">⬇️</div>
+            <p class="text-xs font-semibold text-gray-200 mb-0.5">Télécharge</p>
+            <p class="text-xs text-gray-500">HTML prêt à l'emploi</p>
+          </div>
+        </div>
       </div>
-      <div id="loadingState" class="hidden text-center p-10">
-        <div class="loader mx-auto mb-6"></div>
-        <h2 class="text-xl font-bold mb-2">Gemini génère ton app...</h2>
-        <p class="text-gray-400 text-sm mt-1">15 à 30 secondes pour une app complète</p>
+
+      <!-- Loading state -->
+      <div id="loadingState" class="hidden text-center p-10 max-w-sm fade-in">
+        <div class="relative mx-auto mb-6 w-16 h-16 flex items-center justify-center">
+          <div class="absolute inset-0 rounded-full bg-indigo-500/10 animate-ping"></div>
+          <div class="loader"></div>
+        </div>
+        <h2 class="text-xl font-bold mb-1">Génération en cours…</h2>
+        <p id="loadingStepText" class="text-indigo-400 text-sm font-medium mb-4">Analyse de ta description</p>
+        <div class="flex justify-center gap-2 mb-4 loading-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="flex justify-center gap-2" id="stepDots">
+          <div class="step-dot active" title="Analyse"></div>
+          <div class="step-dot" title="Génération"></div>
+          <div class="step-dot" title="Finalisation"></div>
+        </div>
+        <p class="text-gray-500 text-xs mt-4">Gemini génère votre app complète…</p>
       </div>
+
+      <!-- Preview wrapper -->
       <div id="previewWrapper" class="hidden w-full h-full flex items-center justify-center p-4">
-        <div id="deviceBox" class="bg-white rounded-2xl overflow-hidden shadow-2xl w-full h-full transition-all duration-300">
+        <div id="deviceBox" class="bg-white rounded-2xl overflow-hidden w-full h-full">
           <iframe id="previewFrame" style="width:100%;height:100%;border:none;"></iframe>
         </div>
       </div>
     </div>
 
-    <!-- Code -->
+    <!-- Code panel -->
     <div id="panel-code" class="hidden flex-1 overflow-auto bg-gray-950 p-5">
-      <pre id="codeDisplay" class="text-emerald-400 whitespace-pre-wrap break-all text-xs"></pre>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500/70"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+        </div>
+        <span class="text-xs text-gray-500 font-mono">index.html</span>
+      </div>
+      <pre id="codeDisplay" class="text-emerald-400 whitespace-pre-wrap break-all text-xs leading-relaxed"></pre>
     </div>
   </div>
 </div>
