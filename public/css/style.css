@@ -21,6 +21,37 @@ body { font-family: 'Inter', system-ui, sans-serif; }
   100% { background-position: 0% 50%; }
 }
 
+/* ── Main content height ── */
+.main-content { height: calc(100vh - 57px); }
+
+/* ── Desktop: both panels visible ── */
+@media (min-width: 768px) {
+  #chatPanel    { display: flex !important; }
+  #previewPanel { display: flex !important; }
+  #mobileNav    { display: none !important; }
+}
+
+/* ── Mobile: toggle panels via body attribute ── */
+@media (max-width: 767px) {
+  .main-content { height: calc(100vh - 57px - 56px); }
+
+  body[data-mobile-view="chat"] #chatPanel    { display: flex; }
+  body[data-mobile-view="chat"] #previewPanel { display: none; }
+
+  body[data-mobile-view="preview"] #chatPanel    { display: none; }
+  body[data-mobile-view="preview"] #previewPanel { display: flex; }
+
+  /* Active nav tab */
+  body[data-mobile-view="chat"]    #mobileNavChat    .nav-label { color: #818cf8; }
+  body[data-mobile-view="chat"]    #mobileNavPreview .nav-label { color: #6b7280; }
+  body[data-mobile-view="preview"] #mobileNavPreview .nav-label { color: #818cf8; }
+  body[data-mobile-view="preview"] #mobileNavChat    .nav-label { color: #6b7280; }
+
+  /* Remove border-radius on device box for mobile fullscreen */
+  #deviceBox { border-radius: 12px !important; }
+  #previewWrapper { padding: 8px !important; }
+}
+
 /* ── Loader ── */
 .loader {
   width: 40px; height: 40px;
@@ -38,11 +69,16 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 .template-mini {
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 8px;
-  padding: 5px 4px;
+  padding: 6px 4px;
   text-align: center;
   cursor: pointer;
   transition: all 0.15s ease;
   background: rgba(255,255,255,0.02);
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .template-mini:hover {
   border-color: rgba(99,102,241,0.4);
@@ -58,7 +94,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 .chat-bubble {
   max-width: 90%;
   border-radius: 14px;
-  padding: 8px 12px;
+  padding: 9px 13px;
   font-size: 13px;
   line-height: 1.5;
   animation: fadeIn 0.2s ease;
@@ -108,21 +144,16 @@ body { font-family: 'Inter', system-ui, sans-serif; }
   cursor: pointer;
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 9px 11px;
   transition: all 0.15s ease;
+  min-height: 44px;
 }
-.project-card:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(99,102,241,0.3);
-}
-.project-card.active {
-  background: rgba(99,102,241,0.12);
-  border-color: rgba(99,102,241,0.5);
-}
+.project-card:hover  { background: rgba(255,255,255,0.04); border-color: rgba(99,102,241,0.3); }
+.project-card.active { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.5); }
 
 /* ── Projects panel collapse ── */
 .projects-collapsed { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-.projects-expanded  { max-height: 280px; overflow-y: auto; transition: max-height 0.3s ease; }
+.projects-expanded  { max-height: 240px; overflow-y: auto; transition: max-height 0.3s ease; }
 
 /* ── Send button ── */
 .send-btn {
@@ -137,6 +168,11 @@ body { font-family: 'Inter', system-ui, sans-serif; }
   box-shadow: 0 4px 12px rgba(99,102,241,0.4);
 }
 .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Mobile nav ── */
+#mobileNav { padding-bottom: env(safe-area-inset-bottom, 0px); }
+#mobileNav button { -webkit-tap-highlight-color: transparent; }
+#mobileNav button:active { background: rgba(255,255,255,0.05); }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }

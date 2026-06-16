@@ -9,29 +9,29 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="bg-gray-950 text-white min-h-screen flex flex-col">
+<body class="bg-gray-950 text-white min-h-screen flex flex-col" data-mobile-view="chat">
 
 <!-- Header -->
-<header class="gradient-bg px-6 py-3 flex items-center justify-between shadow-2xl relative z-10">
-  <div class="flex items-center gap-3">
-    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-xl">🚀</div>
-    <span class="font-bold text-lg tracking-tight">NoCode AI Builder</span>
-    <span id="modelBadge" class="text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium border border-white/10">Gemini 2.5</span>
+<header class="gradient-bg px-4 md:px-6 py-3 flex items-center justify-between shadow-2xl relative z-10">
+  <div class="flex items-center gap-2 md:gap-3 min-w-0">
+    <div class="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-xl flex items-center justify-center text-lg md:text-xl flex-shrink-0">🚀</div>
+    <span class="font-bold text-base md:text-lg tracking-tight truncate">NoCode AI Builder</span>
+    <span id="modelBadge" class="hidden md:inline-flex text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium border border-white/10 flex-shrink-0">Gemini 2.5</span>
   </div>
-  <div class="flex gap-2 items-center">
-    <div id="projectNameWrapper" class="hidden items-center gap-1.5 bg-white/10 rounded-lg px-3 py-1.5 border border-white/10">
-      <span class="text-xs text-white/60">📁</span>
-      <span id="currentProjectName" class="text-sm font-medium max-w-xs truncate">Sans titre</span>
+  <div class="flex gap-2 items-center flex-shrink-0">
+    <div id="projectNameWrapper" class="hidden items-center gap-1.5 bg-white/10 rounded-lg px-2.5 py-1.5 border border-white/10 max-w-32 md:max-w-xs">
+      <span class="text-xs text-white/60 flex-shrink-0">📁</span>
+      <span id="currentProjectName" class="text-xs md:text-sm font-medium truncate">Sans titre</span>
     </div>
-    <button id="openTabBtn" class="hidden bg-white text-indigo-600 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-50 transition-all shadow-sm">↗ Ouvrir</button>
+    <button id="openTabBtn" class="hidden bg-white text-indigo-600 px-3 md:px-4 py-1.5 rounded-lg text-xs md:text-sm font-bold hover:bg-indigo-50 transition-all shadow-sm">↗</button>
   </div>
 </header>
 
-<!-- Main -->
-<div class="flex flex-1 overflow-hidden" style="height:calc(100vh - 57px)">
+<!-- Main content -->
+<div id="mainContainer" class="main-content flex flex-1 overflow-hidden">
 
-  <!-- Left Panel -->
-  <div class="w-96 bg-gray-900 flex flex-col border-r border-gray-800/80">
+  <!-- Chat Panel (Left on desktop, full-screen on mobile) -->
+  <div id="chatPanel" class="w-full md:w-96 md:flex-shrink-0 bg-gray-900 flex-col border-r border-gray-800/80">
 
     <!-- Projects Section -->
     <div class="border-b border-gray-800/80 flex-shrink-0">
@@ -52,88 +52,81 @@
       </div>
     </div>
 
-    <!-- Templates (compact 4-col) -->
+    <!-- Templates -->
     <div class="p-3 border-b border-gray-800/80 flex-shrink-0">
       <p class="text-xs text-indigo-400 font-semibold mb-2 tracking-wider">TYPE D'APP</p>
       <div class="grid grid-cols-4 gap-1.5" id="templateGrid"></div>
     </div>
 
-    <!-- Chat Section (flex-1) -->
+    <!-- Chat -->
     <div class="flex-1 flex flex-col overflow-hidden">
-      <!-- Messages -->
       <div id="chatMessages" class="flex-1 overflow-y-auto p-3 space-y-2.5">
         <div class="chat-bubble chat-bubble-ai">
-          👋 Décris l'app que tu veux créer — je la génère pour toi. Tu peux choisir un type ci-dessus pour guider la génération !
+          👋 Décris l'app que tu veux créer — je la génère pour toi !
         </div>
       </div>
-
-      <!-- Input -->
       <div class="p-3 border-t border-gray-800/80 flex-shrink-0">
         <div class="flex gap-2 items-end">
           <textarea id="chatInput" rows="2"
             placeholder="Décris ton app ou demande une modification..."
             class="flex-1 bg-gray-800/80 border border-gray-700/80 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 resize-none focus:border-indigo-500 focus:outline-none transition-colors"></textarea>
-          <button id="sendBtn" class="send-btn w-10 h-10 flex items-center justify-center text-white">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <button id="sendBtn" class="send-btn w-11 h-11 flex items-center justify-center text-white flex-shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"></line>
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
           </button>
         </div>
         <div class="flex items-center justify-between mt-1.5">
-          <p class="text-xs text-gray-600">Ctrl+Entrée pour envoyer</p>
+          <p class="text-xs text-gray-600 hidden md:block">Ctrl+Entrée pour envoyer</p>
           <button id="downloadBtn" class="hidden text-xs text-emerald-400 hover:text-emerald-300 transition-all">⬇️ Télécharger</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Right Panel -->
-  <div class="flex-1 flex flex-col overflow-hidden">
+  <!-- Preview Panel (Right on desktop, full-screen on mobile) -->
+  <div id="previewPanel" class="flex-1 flex-col overflow-hidden">
 
     <!-- Tabs + device -->
-    <div class="bg-gray-900 border-b border-gray-800/80 flex items-center px-4 py-2 gap-1">
-      <button id="tab-preview" class="tab-active px-4 py-1.5 rounded-lg text-sm transition-all">👁️ Aperçu</button>
-      <button id="tab-code" class="px-4 py-1.5 rounded-lg text-sm transition-all bg-gray-800 text-gray-400 hover:text-gray-200">💻 Code</button>
-      <div class="ml-auto flex gap-1.5 items-center">
-        <span class="text-xs text-gray-600 mr-1">Appareil :</span>
-        <button id="dev-full"   class="text-xs px-3 py-1.5 rounded-lg bg-gray-700 text-white font-medium transition-all">🖥️</button>
-        <button id="dev-tablet" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300 transition-all">📱 768</button>
-        <button id="dev-mobile" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300 transition-all">📲 375</button>
+    <div class="bg-gray-900 border-b border-gray-800/80 flex items-center px-3 md:px-4 py-2 gap-1">
+      <button id="tab-preview" class="tab-active px-3 md:px-4 py-1.5 rounded-lg text-sm transition-all">👁️ Aperçu</button>
+      <button id="tab-code" class="px-3 md:px-4 py-1.5 rounded-lg text-sm transition-all bg-gray-800 text-gray-400 hover:text-gray-200">💻 Code</button>
+      <div class="ml-auto flex gap-1 md:gap-1.5 items-center">
+        <button id="dev-full"   class="text-xs px-2 md:px-3 py-1.5 rounded-lg bg-gray-700 text-white font-medium transition-all">🖥️</button>
+        <button id="dev-tablet" class="hidden md:block text-xs px-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300 transition-all">📱 768</button>
+        <button id="dev-mobile" class="text-xs px-2 md:px-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 hover:text-gray-300 transition-all">📲</button>
       </div>
     </div>
 
-    <!-- Preview -->
+    <!-- Preview area -->
     <div id="panel-preview" class="flex-1 flex items-center justify-center bg-gray-800/40 overflow-hidden">
-
-      <!-- Empty state -->
-      <div id="emptyState" class="text-center p-10 max-w-lg fade-in">
-        <div class="text-6xl mb-5 select-none">🎨</div>
-        <h2 class="text-2xl font-bold mb-2">Génère ton app <span class="gradient-text">en secondes</span></h2>
+      <div id="emptyState" class="text-center p-6 md:p-10 max-w-lg fade-in">
+        <div class="text-5xl md:text-6xl mb-4 select-none">🎨</div>
+        <h2 class="text-xl md:text-2xl font-bold mb-2">Génère ton app <span class="gradient-text">en secondes</span></h2>
         <p class="text-gray-400 text-sm mb-6 leading-relaxed">
           Décris ce que tu veux dans le chat, et Gemini crée une application
-          <strong class="text-white">100% fonctionnelle</strong> — sans écrire une ligne de code.
+          <strong class="text-white">100% fonctionnelle</strong>.
         </p>
-        <div class="grid grid-cols-3 gap-3 text-left">
-          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl p-3">
-            <div class="text-xl mb-1.5">💬</div>
+        <div class="grid grid-cols-3 gap-2 md:gap-3 text-left">
+          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl p-2.5 md:p-3">
+            <div class="text-lg md:text-xl mb-1">💬</div>
             <p class="text-xs font-semibold text-gray-200 mb-0.5">Décris</p>
-            <p class="text-xs text-gray-500">En langage naturel</p>
+            <p class="text-xs text-gray-500 hidden md:block">En langage naturel</p>
           </div>
-          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl p-3">
-            <div class="text-xl mb-1.5">⚡</div>
+          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl p-2.5 md:p-3">
+            <div class="text-lg md:text-xl mb-1">⚡</div>
             <p class="text-xs font-semibold text-gray-200 mb-0.5">Génère</p>
-            <p class="text-xs text-gray-500">En 15–30 secondes</p>
+            <p class="text-xs text-gray-500 hidden md:block">En 15–30 secondes</p>
           </div>
-          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl p-3">
-            <div class="text-xl mb-1.5">⬇️</div>
+          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl p-2.5 md:p-3">
+            <div class="text-lg md:text-xl mb-1">⬇️</div>
             <p class="text-xs font-semibold text-gray-200 mb-0.5">Télécharge</p>
-            <p class="text-xs text-gray-500">HTML prêt à l'emploi</p>
+            <p class="text-xs text-gray-500 hidden md:block">HTML prêt à l'emploi</p>
           </div>
         </div>
       </div>
 
-      <!-- Loading state -->
       <div id="loadingState" class="hidden text-center p-10 max-w-sm fade-in">
         <div class="relative mx-auto mb-5 w-16 h-16 flex items-center justify-center">
           <div class="absolute inset-0 rounded-full bg-indigo-500/10 animate-ping"></div>
@@ -144,8 +137,7 @@
         <p class="text-gray-500 text-xs mt-4">Gemini génère votre app complète…</p>
       </div>
 
-      <!-- Preview wrapper -->
-      <div id="previewWrapper" class="hidden w-full h-full flex items-center justify-center p-4">
+      <div id="previewWrapper" class="hidden w-full h-full flex items-center justify-center p-2 md:p-4">
         <div id="deviceBox" class="bg-white rounded-2xl overflow-hidden w-full h-full">
           <iframe id="previewFrame" style="width:100%;height:100%;border:none;"></iframe>
         </div>
@@ -153,7 +145,7 @@
     </div>
 
     <!-- Code panel -->
-    <div id="panel-code" class="hidden flex-1 overflow-auto bg-gray-950 p-5">
+    <div id="panel-code" class="hidden flex-1 overflow-auto bg-gray-950 p-4 md:p-5">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-1.5">
           <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
@@ -166,6 +158,18 @@
     </div>
   </div>
 </div>
+
+<!-- Mobile bottom navigation -->
+<nav id="mobileNav" class="md:hidden fixed bottom-0 inset-x-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-800 flex z-30">
+  <button id="mobileNavChat" class="flex-1 py-3 flex flex-col items-center gap-0.5 transition-all">
+    <span class="text-xl">💬</span>
+    <span class="nav-label text-xs font-semibold text-indigo-400">Chat</span>
+  </button>
+  <button id="mobileNavPreview" class="flex-1 py-3 flex flex-col items-center gap-0.5 transition-all">
+    <span class="text-xl">👁️</span>
+    <span class="nav-label text-xs font-medium text-gray-500">Aperçu</span>
+  </button>
+</nav>
 
 <script src="/js/app.js"></script>
 </body>

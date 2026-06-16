@@ -58,6 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('dev-full').addEventListener('click', function () { setDevice('full'); });
   document.getElementById('dev-tablet').addEventListener('click', function () { setDevice('tablet'); });
   document.getElementById('dev-mobile').addEventListener('click', function () { setDevice('mobile'); });
+
+  // Mobile navigation
+  document.getElementById('mobileNavChat').addEventListener('click', function () { switchMobileView('chat'); });
+  document.getElementById('mobileNavPreview').addEventListener('click', function () { switchMobileView('preview'); });
 });
 
 // ── Templates ──────────────────────────────────────────────────────────────
@@ -212,6 +216,8 @@ function newProject() {
   resetPreview();
   resetChat();
   renderProjectsList();
+  // On mobile, go back to chat view on new project
+  if (isMobile()) switchMobileView('chat');
 }
 
 function updateProjectNameBadge(name) {
@@ -423,6 +429,8 @@ function renderPreview(code) {
   document.getElementById('emptyState').classList.add('hidden');
   document.getElementById('loadingState').classList.add('hidden');
   document.getElementById('previewWrapper').classList.remove('hidden');
+  // On mobile, automatically switch to preview after generation
+  if (isMobile()) switchMobileView('preview');
 }
 
 function resetPreview() {
@@ -478,6 +486,16 @@ function startLoadingSteps() {
 function updateLoadingStep(step) {
   var text = document.getElementById('loadingStepText');
   if (text) text.textContent = LOADING_STEPS[step] || LOADING_STEPS[LOADING_STEPS.length - 1];
+}
+
+// ── Mobile view ────────────────────────────────────────────────────────────
+
+function switchMobileView(view) {
+  document.body.dataset.mobileView = view;
+}
+
+function isMobile() {
+  return window.innerWidth < 768;
 }
 
 // ── UI helpers ─────────────────────────────────────────────────────────────
