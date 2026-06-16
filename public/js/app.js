@@ -17,7 +17,7 @@ const LOADING_STEPS = [
   'Finalisation du code…',
 ];
 
-const API_URL = 'https://api.base44.app/api/apps/6a05cc815554bfe5eed22c82/functions/generateCode';
+const API_URL = '/api/generate';
 const STORAGE_KEY = 'nocode_projects_v1';
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -409,7 +409,7 @@ async function callBackend(payload) {
   var res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: JSON.stringify(payload) })
+    body: JSON.stringify(payload)
   });
   var data = await res.json();
   if (data.error) throw new Error(data.error);
