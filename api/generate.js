@@ -1,4 +1,5 @@
-export const config = { runtime: 'edge' };
+// Vercel Serverless Function (Node.js) — timeout 60s
+export const maxDuration = 60;
 
 const TEMPLATE_PROMPTS = {
   todo: `Génère une application de gestion de tâches COMPLÈTEMENT FONCTIONNELLE.\nFONCTIONNALITÉS OBLIGATOIRES:\n- Ajouter une tâche (champ texte + bouton + touche Entrée)\n- Cocher/décocher avec strike-through visuel\n- Supprimer une tâche (bouton ×)\n- Filtres: Toutes / Actives / Terminées (onglets fonctionnels)\n- Compteur de tâches restantes en temps réel\n- localStorage pour persistence\n- 5 tâches d'exemple pré-chargées`,
@@ -11,35 +12,22 @@ const TEMPLATE_PROMPTS = {
   calendar: `Génère un planning/calendrier COMPLÈTEMENT FONCTIONNEL.\nFONCTIONNALITÉS OBLIGATOIRES:\n- Vue calendrier mensuel avec navigation\n- Clic sur un jour pour ajouter un événement (modal)\n- Événements affichés sur les bons jours\n- Clic sur un événement pour le supprimer\n- Mise en évidence du jour actuel\n- 6 événements d'exemple pré-chargés`,
 };
 
-export default async function handler(req) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
-  }
-
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'Clé API Gemini non configurée sur le serveur.' }), { status: 500, headers });
+    return res.status(500).json({
+      error: 'GEMINI_API_KEY non configurée. Ajoute-la dans Vercel → Settings → Environment Variables.'
+    });
   }
 
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return new Response(JSON.stringify({ error: 'Corps de requête invalide' }), { status: 400, headers });
-  }
-
-  const { template, description, currentCode, modifyPrompt } = body;
+  const { template, description, currentCode, modifyPrompt } = req.body || {};
 
   let prompt;
   if (modifyPrompt && currentCode) {
@@ -49,7 +37,7 @@ export default async function handler(req) {
     prompt = `${base}\n\nPERSONNALISATION: ${description || 'App standard avec données réalistes'}\n\nRÈGLES ABSOLUES:\n1. Retourne UNIQUEMENT le code HTML complet (<!DOCTYPE html>...</html>)\n2. Tout le CSS et JS inline dans ce fichier\n3. Utilise Tailwind CSS via CDN: <script src="https://cdn.tailwindcss.com"></script>\n4. Design moderne, coloré, professionnel\n5. TOUTES les fonctionnalités doivent fonctionner\n6. Aucun import externe sauf Tailwind CDN`;
   }
 
-  const models = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+  const models = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite'];
   let lastError = null;
 
   for (const model of models) {
@@ -61,20 +49,32 @@ export default async function handler(req) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 65536, temperature: 0.4 },
+            generationConfig: { maxOutputTokens: 32768, temperature: 0.4 },
           }),
         }
       );
+
       const data = await response.json();
-      if (!response.ok) { lastError = data.error?.message || 'Erreur API'; continue; }
+
+      if (!response.ok) {
+        lastError = `[${model}] ${data.error?.message || response.status}`;
+        continue;
+      }
+
       const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (!raw) { lastError = 'Réponse vide'; continue; }
-      const code = raw.replace(/^```html\n?/i, '').replace(/^```\n?/, '').replace(/\n?```$/, '').trim();
-      return new Response(JSON.stringify({ code, model }), { status: 200, headers });
+      if (!raw) { lastError = `[${model}] Réponse vide`; continue; }
+
+      const code = raw
+        .replace(/^```html\n?/i, '')
+        .replace(/^```\n?/, '')
+        .replace(/\n?```$/, '')
+        .trim();
+
+      return res.status(200).json({ code, model });
     } catch (e) {
-      lastError = e.message;
+      lastError = `[${model}] ${e.message}`;
     }
   }
 
-  return new Response(JSON.stringify({ error: lastError || 'Tous les modèles ont échoué' }), { status: 500, headers });
+  return res.status(500).json({ error: lastError || 'Tous les modèles Gemini ont échoué.' });
 }
