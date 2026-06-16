@@ -1,6 +1,197 @@
-.gradient-bg { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
-.loader { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body { font-family: 'Inter', system-ui, sans-serif; }
+
+/* ── Brand gradient ── */
+.gradient-bg { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%); }
+
+/* ── Gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Main content height ── */
+.main-content { height: calc(100vh - 57px); }
+
+/* ── Desktop: both panels visible ── */
+@media (min-width: 768px) {
+  #chatPanel    { display: flex !important; }
+  #previewPanel { display: flex !important; }
+  #mobileNav    { display: none !important; }
+}
+
+/* ── Mobile: toggle panels via body attribute ── */
+@media (max-width: 767px) {
+  .main-content { height: calc(100vh - 57px - 56px); }
+
+  body[data-mobile-view="chat"] #chatPanel    { display: flex; }
+  body[data-mobile-view="chat"] #previewPanel { display: none; }
+
+  body[data-mobile-view="preview"] #chatPanel    { display: none; }
+  body[data-mobile-view="preview"] #previewPanel { display: flex; }
+
+  /* Active nav tab */
+  body[data-mobile-view="chat"]    #mobileNavChat    .nav-label { color: #818cf8; }
+  body[data-mobile-view="chat"]    #mobileNavPreview .nav-label { color: #6b7280; }
+  body[data-mobile-view="preview"] #mobileNavPreview .nav-label { color: #818cf8; }
+  body[data-mobile-view="preview"] #mobileNavChat    .nav-label { color: #6b7280; }
+
+  /* Remove border-radius on device box for mobile fullscreen */
+  #deviceBox { border-radius: 12px !important; }
+  #previewWrapper { padding: 8px !important; }
+}
+
+/* ── Loader ── */
+.loader {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(255,255,255,0.12);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Tabs ── */
 .tab-active { background: white !important; color: #6366f1 !important; font-weight: 600; }
-.template-card.selected { border-color: #6366f1 !important; background: rgba(99,102,241,0.15) !important; }
-pre { font-family: 'Courier New', monospace; }
+
+/* ── Template mini cards ── */
+.template-mini {
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 6px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: rgba(255,255,255,0.02);
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.template-mini:hover {
+  border-color: rgba(99,102,241,0.4);
+  background: rgba(99,102,241,0.08);
+}
+.template-mini.selected {
+  border-color: #6366f1;
+  background: rgba(99,102,241,0.18);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.25);
+}
+
+/* ── Chat bubbles ── */
+.chat-bubble {
+  max-width: 90%;
+  border-radius: 14px;
+  padding: 9px 13px;
+  font-size: 13px;
+  line-height: 1.5;
+  animation: fadeIn 0.2s ease;
+  word-break: break-word;
+}
+.chat-bubble-user {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+.chat-bubble-ai {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #d1d5db;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+.chat-bubble-success {
+  border-color: rgba(52,211,153,0.25) !important;
+  background: rgba(16,185,129,0.07) !important;
+  color: #6ee7b7 !important;
+}
+.chat-bubble-error {
+  border-color: rgba(248,113,113,0.25) !important;
+  background: rgba(239,68,68,0.07) !important;
+  color: #fca5a5 !important;
+}
+
+/* ── Typing indicator ── */
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+.typing-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #818cf8;
+  animation: typingBounce 1.2s ease infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%            { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Project cards ── */
+.project-card {
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 9px 11px;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+.project-card:hover  { background: rgba(255,255,255,0.04); border-color: rgba(99,102,241,0.3); }
+.project-card.active { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.5); }
+
+/* ── Projects panel collapse ── */
+.projects-collapsed { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.projects-expanded  { max-height: 240px; overflow-y: auto; transition: max-height 0.3s ease; }
+
+/* ── Send button ── */
+.send-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.send-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+}
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Mobile nav ── */
+#mobileNav { padding-bottom: env(safe-area-inset-bottom, 0px); }
+#mobileNav button { -webkit-tap-highlight-color: transparent; }
+#mobileNav button:active { background: rgba(255,255,255,0.05); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Animations ── */
+.fade-in { animation: fadeIn 0.35s ease forwards; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Device frame ── */
+#deviceBox {
+  transition: max-width 0.3s ease, max-height 0.3s ease;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ── Code view ── */
+pre { font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace; }
